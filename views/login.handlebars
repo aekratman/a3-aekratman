@@ -9,39 +9,48 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <title>POST LOGIN</title>
     <script src="/client.js" defer></script>
+    <style>
+        button {
+            padding: 10px 20px; /* Increase padding for better touch target */
+            font-size: 16px; /* Larger font size for readability */
+            margin-top: 10px; /* Space between elements */
+        }
+        form ul {
+            list-style-type: none; /* Remove default list styling */
+            padding: 0; /* Remove padding */
+        }
+        form li {
+            margin-bottom: 15px; /* Space between form elements */
+        }
+    </style>
 </head>
 
 <body class="bg-lightblue text-dark">
     <div class="flex">
         <div class="nunito">
-            <br><h1>{{msg}}</h1>
-
-            <h3></h3>
             <h1>Musical Theatre Role Rankings</h1>
+            <h2>{{msg}}</h2>
             <p>Enter in a character from a musical and find their role (lead/secondary/ensemble)!</p>
+            <h3>Results!</h3>
+            <p class="card-text">I am editing this.</p>
 
-            <h2>Results!</h2>
-            <p class="card-text">This is a bootstrap test.</p>
-
-            <form>
+            <form action="/submit" method="POST">
                 <ul>
                     <li>
                         <label for="name">Character name:</label>
-                        <input type="text" id="name" value="">
+                        <input type="text" id="name" name="name" value="" required>
                     </li>
                     <li>
                         <label for="musical">Musical From:</label>
-                        <input type="text" id="musical" value="" />
+                        <input type="text" id="musical" name="musical" value="" required />
                     </li>
                     <li>
-                        <label for="msg">Solo Song Count:</label>
-                        <input type="number" id="songs" value="">
+                        <label for="songs">Solo Song Count:</label>
+                        <input type="number" id="songs" name="songs" value="" required>
                     </li>
                 </ul>
+                <button type="submit" id="btnSubmit">Generate your table!</button>
             </form>
-
-            <button type="submit" id="btnSubmit">Generate your table!</button>
-            <br><br><br>
         </div> <!-- close nunito -->
     </div> <!-- close flex -->
 </body>
