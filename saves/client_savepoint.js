@@ -13,7 +13,7 @@ const submit = async function(event) {
   const json = { 
     name: input.value.trim() !== "" ? input.value : "Unnamed",  
     musical: input2.value, 
-    songs: input3.value
+    songs: Number(input3.value) // Ensure songs is a number
   };
   
   const body = JSON.stringify(json);
@@ -222,14 +222,8 @@ function generateTable(data) {
         const updatedData = {
           name: nameInput.value.trim() !== "" ? nameInput.value : "Unnamed", // Use "Unnamed" if empty
           musical: musicalInput.value,
-          songs: songsInput.value
+          songs: Number(songsInput.value) // Ensure songs is a number
         };
-        const newRole = calculateRole(songsInput.value);
-        updatedData.role = newRole;
-    
-        // Update the role in the role column automatically after saving
-        cellRole.textContent = newRole;
-        console.log("New role: ", newRole);
 
         // Save changes and update the table
         updateCharacter(item.name, updatedData).then(updatedList => {
@@ -247,7 +241,7 @@ function generateTable(data) {
     deleteButton.textContent = "Delete";
     deleteButton.onclick = function() {
     
-      deleteCharacter(itemName); 
+      deleteCharacter(itemName);  // Use the 'itemName' which is set to "Unnamed" if missing
     };
     
     cellActions.appendChild(deleteButton);

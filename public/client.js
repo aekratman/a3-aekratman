@@ -1,10 +1,13 @@
-// Global variable to hold the logged-in username
-window.loggedInUsername = '';
 
-// Function to handle login
+const username = document.querySelector("meta[name='username']").getAttribute("content");
+window.loggedInUsername = username || "";
+console.log("Logged in as:", window.loggedInUsername);
+
+
 const login = async (event) => {
-    event.preventDefault();
+  console.log("Login running");
 
+    event.preventDefault();
     const inputUsername = document.querySelector('#username').value;
     const inputPassword = document.querySelector('#password').value;
 
@@ -39,7 +42,8 @@ const submit = async (event) => {
     const json = { 
         name: input.value.trim() !== "" ? input.value : "Unnamed",  
         musical: input2.value, 
-        songs: input3.value
+        songs: input3.value,
+        username: window.loggedInUsername 
     };
 
     const body = JSON.stringify(json);
@@ -59,14 +63,14 @@ const submit = async (event) => {
 
     // Get the JSON response and update the table
     const updatedList = await response.json();
-    console.log(`User logged in as: ${updatedList.username}`);
+    console.log("Updated list:", updatedList);
     clearTable();
     generateTable(updatedList);
 };
 
 // Function to clear the existing table
 function clearTable() {
-    const currentTable = document.querySelector('table');
+    const currentTable = document.querySelector('#dataTable');
     if (currentTable) {
         currentTable.remove();
     }
@@ -87,7 +91,7 @@ async function deleteCharacter(name) {
             if (Array.isArray(updatedList)) {
                 updated(updatedList);
             } else {
-                console.error("Error. Expected an array but got ", updatedList);
+                console.error("Expected an array but got:", updatedList);
             }
         } else {
             console.error("Issue during deletion:", await response.text());
@@ -285,10 +289,4 @@ function updated(data) {
 window.onload = function() {
     const button = document.querySelector("#btnSubmit");
     button.onclick = submit;
-
-    const loginForm = document.querySelector("#loginForm");
-    loginForm.onsubmit = login;  // Assuming your login form has the ID "loginForm"
 };
-
-// Log the currently logged-in username
-console.log("Logged in as:", window.loggedInUsername);

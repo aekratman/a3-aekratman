@@ -1,14 +1,15 @@
 require('dotenv').config();
+console.log("This is the most recent");
 
 const express = require('express'),
       cookie = require('cookie-session'),
       hbs = require('express-handlebars').engine,
       { MongoClient, ObjectId } = require('mongodb');
 const app = express();
-
-
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+
 
 const uri = 'mongodb+srv://aekratman:abbeysPassword@abbeyscluster.0bppf.mongodb.net/?retryWrites=true&w=majority&appName=AbbeysCluster/';
 const client = new MongoClient(uri);
@@ -152,6 +153,33 @@ app.post('/login', async (req, res) => {
   } catch (error) {
     console.error("Error during login process:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post('/submit', async (req, res) => {
+  console.log("Submit slapped");
+  const { name, musical, songs } = req.body; 
+  const username = req.session.username; // Get username from session
+
+  console.log("Received data:", req.body); // Log the incoming data
+
+  if (!collection) {
+    return res.status(500).json({ error: 'Collection not initialized.' });
+  }
+
+  try {
+    const result = await collection.insertOne({ username, name, musical, songs });
+    console.log("Insertion result:", result); // Log the result of the insertion
+
+    if (result.insertedId) {
+      const allDocuments = await collection.find().toArray(); 
+      res.json(allDocuments);
+    } else {
+      res.status(500).json({ error: 'Insertion failed, no document was inserted.' });
+    }
+  } catch (error) {
+    console.error("Error inserting document:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
