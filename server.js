@@ -229,6 +229,7 @@ app.get('/', (req, res) => {
 
 // Middleware to redirect unauthenticated users to the login page
 app.use(function(req, res, next) {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net;");
   if (req.session.login === true)
     next();
   else

@@ -1,3 +1,6 @@
+const loggedInUsername = "{{username}}";  // Inject the username from the backend
+console.log("Logged in as:", loggedInUsername);
+
 // Function to handle form submission
 const submit = async function(event) {
   event.preventDefault();
@@ -136,16 +139,28 @@ function generateTable(data) {
   } else {
     tblBody.innerHTML = ""; // Clear existing rows
   }
-
   // Create rows
   data.forEach(item => {
+    const loggedInUsername = item.username;
+
     const row = document.createElement("tr");
 
     // Skip if it's sensitive data like passwords
     if (item.password) {
-      console.log("Skipping sensitive data:", item);
       return;  // Skip this entry if it's related to user credentials
     }
+    
+    // Check if the username matches the logged-in user
+    if (item.username !== (loggedInUsername || '')) { // Default to empty string if loggedInUsername is undefined
+      console.log("Skipping item for user:", item.username);
+      return;  // Skip this entry if the username does not match
+    }
+
+
+    if (item.username !== loggedInUsername) {
+      console.log("Skipping item for user:", item.username);
+      return;  // Skip this entry if the username does not match
+  }
 
     // Fallback to "Unnamed" if name is missing or empty
     const itemName = item.name && item.name.trim() !== "" ? item.name : "Unnamed";
