@@ -3,67 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' http://127.0.0.1:3000">
-    <script src="public/client.js" defer></script>
-    <link rel="stylesheet" href="public/main.css">
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' http://127.0.0.1:3000">
+    <link rel="stylesheet" href="/public/main.css"> 
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <title>POST LOGIN</title>
 
     <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<!-- bootstrap css customization-->
+
 <body class="bg-lightblue text-dark">
- 
-   
-<div class="flex">
-    <div class="nunito">
-      <br><h1>{{msg}}</h1>
-      <h3></h3>
-    <h1>Musical Theatre Role Rankings</h1>
-      <p>Enter in a character from a musical and find their role (lead/secondary/ensemble)!</p>
-
-      <h2>Results!</h2>
-      <p class="card-text">This is a bootstrap test.</p>
-      
-        
-      
-    <form>
-    <ul>
-      <li>
-      <label for="name">Character name:</label>
-      <input type="text" id="name" value="">
+    <div class="flex">
+        <div class="nunito">
+            <br><h1>{{msg}}</h1>
 
 
-      </li>
-      <li>
-        <label for="musical">Musical From:</label>
-        <input type="text" id="musical" value="" />
+            <!-- Embed the username as a global JavaScript variable -->
+            <script>
+                // Use the {{username}} variable from Handlebars
+                window.loggedInUsername = {{username}}; // Use window to make it globally accessible
+                console.log("HTML is logging in as:", window.loggedInUsername);  
+            </script>
 
-      </li>
-      
-      <li>
-        <label for="msg">Solo Song Count:</label>
-        <input type="number" id="songs" value="">
-      </li>
-      
-    </ul>
-    </form>
-        
-                
-      <button type="submit" id="btnSubmit">Generate your table!</button>
-<br><br><br>
+            <script src="/public/client.js" defer></script> <!-- Ensure this path is correct -->
 
-    
-     </div> <!-- close flex -->
+            <h3></h3>
+            <h1>Musical Theatre Role Rankings</h1>
+            <p>Enter in a character from a musical and find their role (lead/secondary/ensemble)!</p>
 
-    </div> <!-- close font -->
+            <h2>Results!</h2>
+            <p class="card-text">This is a bootstrap test.</p>
 
-<!-- boot your strap-->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+            <form>
+                <ul>
+                    <li>
+                        <label for="name">Character name:</label>
+                        <input type="text" id="name" value="">
+                    </li>
+                    <li>
+                        <label for="musical">Musical From:</label>
+                        <input type="text" id="musical" value="" />
+                    </li>
+                    <li>
+                        <label for="msg">Solo Song Count:</label>
+                        <input type="number" id="songs" value="">
+                    </li>
+                </ul>
+            </form>
+
+            <button type="submit" id="btnSubmit">Generate your table!</button>
+            <br><br><br>
+        </div> <!-- close nunito -->
+    </div> <!-- close flex -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
-

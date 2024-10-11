@@ -6,7 +6,7 @@ const express = require('express'),
       { MongoClient, ObjectId } = require('mongodb');
 const app = express();
 
-// Use express.urlencoded to get data sent by default form actions or GET requests
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -109,71 +109,56 @@ app.put('/update', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 // Login route
 app.post('/login', async (req, res) => {
-  console.log(req.body);
-
+  console.log("Login route reached");
+  
   const username = req.body.username || "null";
   const password = req.body.password;
-  console.log(username);
+  
   console.log(`Attempting login for user: ${username}`);
 
-  if (collection === null) {
-    console.log("collection not set");
+  if (!collection) {
+    console.log("Collection not set");
+    return res.status(500).json({ message: "Internal server error" });
   }
-
-  const user = await collection.findOne({ username: username });
-
-  if (req.body.password === password) {
-    req.session.login = true;
-    req.session.username = username;
-    console.log(`User logged in: ${username}`);
-    res.redirect('login');
-
-    if (!user) {
-      await collection.insertOne({ username: username, password: password });
-    }
-  } else {
-    // Cancel session login in case if it's true
-    req.session.login = false;
-    res.render('index', { msg: 'Login has failed; try again!', layout: false });
-  }
-});
-
-app.use(express.static("./"));
-
-// Submit route
-app.post('/submit', async (req, res) => {
-  const { name, musical, songs } = req.body; // Extract other fields
-  const username = req.session.username; // Get username from session
-
-  console.log("Received data:", req.body); // Log the incoming data
 
   try {
-    // Insert the new document into the MongoDB collection
-    const result = await collection.insertOne({ username, name, musical, songs });
-    console.log("Insertion result:", result); // Log the result of the insertion
+    const user = await collection.findOne({ username: username });
 
-    // Check if the insertion was successful
-    if (result.insertedId) {
-      // Fetch all documents from the collection after insertion
-      const allDocuments = await collection.find().toArray(); // Fetch all entries
-      console.log("All documents fetched:", allDocuments); // Log all documents
-
-      // Send back all documents in an array
-      res.json(allDocuments);
+    // Check if user exists
+    if (user) {
+      // Check if password matches
+      if (user.password === password) {
+        req.session.login = true;
+        req.session.username = username;
+        console.log(`User logged in: ${username}`);
+        return res.redirect('/login');  
+      } else {
+        // Password does not match
+        console.log("User password is", user.password);
+        console.log("Real password is", password);
+        console.log("Password is incorrect");
+        return res.render('index', { msg: 'Login has failed; try again!', username, layout: false });
+      }
     } else {
-      res.status(500).json({ error: 'Insertion failed, no document was inserted.' });
+      // User does not exist, create a new one
+      await collection.insertOne({ username: username, password: password });
+      req.session.login = true;
+      req.session.username = username;
+      console.log(`New user created and logged in: ${username}`);
+      return res.redirect('/login');  // Redirect to login page
     }
   } catch (error) {
-    console.error("Error inserting document:", error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error during login process:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 // Route to get documents for the logged-in user
 app.get("/docs", async (req, res) => {
+  console.log("Docs route reached");
   const username = req.session.username; // Get username from session
 
   if (!username) {
@@ -207,9 +192,9 @@ async function fetchUserDocuments() {
     const response = await fetch('/docs');
     
     if (response.ok) {
-      const userDocuments = await response.json();
+     
       if (Array.isArray(userDocuments)) {
-        generateTable(userDocuments);  // Use your generateTable function
+        generateTable(userDocuments);  
       } else {
         console.error("Expected an array but got:", userDocuments);
       }
@@ -223,11 +208,12 @@ async function fetchUserDocuments() {
 
 // Route for the home page
 app.get('/', (req, res) => {
+  console.log("Home route reached");
   console.log("Rendering your response, apping your GET");
   res.render('index', { msg: '', layout: false });
 });
 
-// Middleware to redirect unauthenticated users to the login page
+
 app.use(function(req, res, next) {
   res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net;");
   if (req.session.login === true)
@@ -236,11 +222,19 @@ app.use(function(req, res, next) {
     res.render('index', { msg: 'login failed, please try again', layout: false });
 });
 
+
+// paste here
 // Route for the login page
 app.get('/login', (req, res) => {
-  const username = req.session.username || ''; // Get username from session
+  console.log("Login2 route reached");
+
+
+  const username = req.session.username || ''; 
+  console.log("Login2's username is...", username);
   const msg = username ? `You've logged in! Welcome, ${username}` : '';
-  res.render('login', { msg: msg, layout: false });
+  console.log("My message is ", msg);
+  console.log("My username is ", username);
+  res.render('login', { msg, username, layout: false });
 });
 
 // Start the server
