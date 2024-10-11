@@ -1,6 +1,3 @@
-
-
-
 // Function to handle form submission
 const submit = async function(event) {
   event.preventDefault();
@@ -107,7 +104,6 @@ function calculateRole(ranking) {
 
 // Function to generate the table
 function generateTable(data) {
-
   let tbl = document.querySelector("#dataTable");
 
   if (!tbl) {
@@ -140,25 +136,26 @@ function generateTable(data) {
   } else {
     tblBody.innerHTML = ""; // Clear existing rows
   }
-
   // Create rows
   data.forEach(item => {
+    const loggedInUsername = item.username;
+
     const row = document.createElement("tr");
 
-    // Skip if not a character
+    // Skip if it's sensitive data like passwords
     if (item.password) {
-      return; 
+      console.log("Skipping sensitive data:", item);
+      return;  // Skip this entry if it's related to user credentials
+    }
+    
+    // Check if the username matches the logged-in user
+    if (item.username !== (loggedInUsername || '')) { // Default to empty string if loggedInUsername is undefined
+      console.log("Skipping item for user:", item.username);
+      return;  // Skip this entry if the username does not match
     }
 
-        // Check if the username matches the logged-in user
-        if (item.username !== loggedInUsername) {
-          console.log("Skipping item for user:", item.username);
-          return;  // Skip this entry if the username does not match
-      }
-
-    // change named to unnamed if empty
+    // Fallback to "Unnamed" if name is missing or empty
     const itemName = item.name && item.name.trim() !== "" ? item.name : "Unnamed";
-
 
     // Create column for names
     const cellName = document.createElement("td");
@@ -217,15 +214,12 @@ function generateTable(data) {
         const updatedData = {
           name: nameInput.value.trim() !== "" ? nameInput.value : "Unnamed", // Use "Unnamed" if empty
           musical: musicalInput.value,
-          songs: songsInput.value, 
-          roles: calculateRole(songsInput.value)
+          songs: Number(songsInput.value) // Ensure songs is a number
         };
 
         // Save changes and update the table
         updateCharacter(item.name, updatedData).then(updatedList => {
           updated(updatedList); 
-          console.log("New role count:", newRole);
-          cellRole.textContent = newRole;
         }).catch(error => {
           console.error("Error updating character:", error); 
         });
@@ -249,28 +243,6 @@ function generateTable(data) {
   });
 }
 
-
-
-// Function to fetch and display the user's documents
-async function fetchUserDocuments() {
-  try {
-    const response = await fetch('/docs');
-    
-    if (response.ok) {
-      const userDocuments = await response.json();
-      if (Array.isArray(userDocuments)) {
-        generateTable(userDocuments);  // Use your generateTable function
-      } else {
-        console.error("Expected an array but got:", userDocuments);
-      }
-    } else {
-      console.error("Failed to fetch user documents:", response.statusText);
-    }
-  } catch (error) {
-    console.error("Error fetching user documents:", error);
-  }
-}
-
 // Function to regenerate the table with updated data
 function updated(data) {
   clearTable();  
@@ -279,8 +251,6 @@ function updated(data) {
 
 // Set up event listeners on window load
 window.onload = function() {
-  console.log("Username from server:", loggedInUsername); // This should log the correct username
   const button = document.querySelector("#btnSubmit");
   button.onclick = submit;    
-  fetchUserDocuments();
 };
