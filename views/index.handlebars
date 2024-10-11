@@ -1,22 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <style>input { display:block }</style>
-     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/index.css"> 
+    <script src="/client.js" defer></script>
+    <title>Login/Register</title>
+</head>
+<body class="bg-lightblue text-dark">
+    <div class="container text-center my-5">
+        <h1>Login/Register</h1>
+        <p>Please enter your username and password!</p>
+        <p>If a new user, simply entering this will create your account. Please save your username and password somewhere safe so you can reaccess your account.</p>
+        
+        <form action="/login" method="POST" class="d-inline-block">
+            <div class="mb-3">
+                <label for="username" class="form-label"><b>Username:</b></label>
+                <input type="text" name="username" id="username" class="form-control w-auto" required>
+            </div>
 
+            <div class="mb-3">
+                <label for="password" class="form-label"><b>Password:</b></label>
+                <input type="password" name="password" id="password" class="form-control w-auto" value="password" required>
+            </div>
 
-  </head>
-  <body>
-    <p>Please enter your username and password (If a new user, simply doing this will create your account.).</p>
-    
-    <form action="/login" method="POST">
-      name: <input type="text" name="username" />
+            <button id="submit" type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+        <div class="mt-3">
+            {{{msg}}}
+        </div>
+    </div>
 
-      password:<input type="password" name="password" value="password" />
-      <input id="submit" type="submit" value="login" />
-    </form>
-    
-    {{{msg}}}
-    
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
