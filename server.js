@@ -1,6 +1,6 @@
 require('dotenv').config();
-console.log("This is the most recent");
 
+// express stuff
 const express = require('express'),
       cookie = require('cookie-session'),
       hbs = require('express-handlebars').engine,
@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-
+// mongo work
 const uri = 'mongodb+srv://aekratman:abbeysPassword@abbeyscluster.0bppf.mongodb.net/?retryWrites=true&w=majority&appName=AbbeysCluster/';
 const client = new MongoClient(uri);
 
@@ -19,12 +19,13 @@ app.engine('handlebars', hbs());
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
+// cookies
 app.use(cookie({
   name: 'session',
   keys: ['secretKey01', 'secretKey02']
 }));
 
-// Create variable collection
+
 let collection = null;
 
 async function run() {
@@ -33,12 +34,7 @@ async function run() {
     
     // Set the collection
     collection = client.db("logFromAssignment").collection("logs");
-    console.log("Collection is set: ", collection !== null);
-    
-    // Insert a test document to the collection
-    // await collection.insertOne({ testField: "testValue" });
-    console.log("Inserted a test document into 'logs' collection.");
-    
+    console.log("Collection is all set: ", collection !== null);
     return collection;
   } catch (err) {
     console.error("Error during MongoDB connection or insertion:", err);
@@ -47,19 +43,19 @@ async function run() {
 
 run().then((collection) => {
   if (collection) {
-    console.log("Collection ready!");
+    console.log("Collection is all ready!");
   } else {
-    console.log("Collection is not all set.");
+    console.log("Collection is not all set :(");
   }
 });
 
-// Route to add a document
+// add route
 app.post('/add', async (req, res) => {
   const result = await collection.insertOne(req.body);
   res.json(result);
 });
 
-// Route to delete a document
+// delete route
 app.delete('/delete', async (req, res) => {
   console.log("Deleting object from MongoDB...");
 
@@ -70,15 +66,14 @@ app.delete('/delete', async (req, res) => {
       return res.status(400).send("Missing name in request body");
     }
 
-    // Delete the document from MongoDB
+    // get rid of it on the db
     const result = await collection.deleteOne({ name: nameToDelete });
 
     if (result.deletedCount === 1) {
       console.log("Successfully deleted the object");
 
-      // Fetch the updated list of characters after deletion
-      const updatedList = await collection.find().toArray();
-      res.status(200).json(updatedList);  // Ensure this is an array
+      // new list + confirm it's an array
+      res.status(200).json(updatedList); 
     } else {
       console.log("Object not found");
       res.status(404).json({ message: "Object not found" });
@@ -89,7 +84,7 @@ app.delete('/delete', async (req, res) => {
   }
 });
 
-// Route to update a document
+// update route
 app.put('/update', async (req, res) => {
   const { oldName, updatedData } = req.body;
 
@@ -110,7 +105,7 @@ app.put('/update', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-// Login route
+// login route
 app.post('/login', async (req, res) => {
   console.log("Login route reached");
   
@@ -127,23 +122,22 @@ app.post('/login', async (req, res) => {
   try {
     const user = await collection.findOne({ username: username });
 
-    // Check if user exists
+    // did user exist
     if (user) {
-      // Check if password matches
+      // does the password match, you goober?
       if (user.password === password) {
         req.session.login = true;
         req.session.username = username;
         console.log(`User logged in: ${username}`);
         return res.redirect('/login');  
       } else {
-        // Password does not match
         console.log("User password is", user.password);
         console.log("Real password is", password);
         console.log("Password is incorrect");
         return res.render('index', { msg: 'Login has failed; try again!', username, layout: false });
       }
     } else {
-      // User does not exist, create a new one
+      // make the user if they don't already exist
       await collection.insertOne({ username: username, password: password });
       req.session.login = true;
       req.session.username = username;
@@ -159,9 +153,10 @@ app.post('/login', async (req, res) => {
 app.post('/submit', async (req, res) => {
   console.log("Submit slapped");
   const { name, musical, songs } = req.body; 
-  const username = req.session.username; // Get username from session
+  const username = req.session.username;
 
-  console.log("Received data:", req.body); // Log the incoming data
+  // make sure you have the stuff
+  console.log("Received data:", req.body); 
 
   if (!collection) {
     return res.status(500).json({ error: 'Collection not initialized.' });
@@ -184,10 +179,10 @@ app.post('/submit', async (req, res) => {
 });
 
 
-// Route to get documents for the logged-in user
+
 app.get("/docs", async (req, res) => {
   console.log("Docs route reached");
-  const username = req.session.username; // Get username from session
+  const username = req.session.username; 
 
   if (!username) {
     return res.status(401).json({ error: "User is not authenticated" });
@@ -195,15 +190,15 @@ app.get("/docs", async (req, res) => {
 
   try {
     if (collection !== null) {
-      // Fetch only the documents where `username` matches the logged-in user
+      // get what we actually want from them
       const userDocuments = await collection.find({ username }).toArray();
 
       if (userDocuments.length > 0) {
         console.log("Matching user documents:", userDocuments);
-        res.json(userDocuments);  // Return documents related to the user
+        res.json(userDocuments);  // user docs
       } else {
         console.log("No documents found for user:", username);
-        res.json([]);  // Return an empty array if no documents are found
+        res.json([]);  
       }
     } else {
       res.status(500).json({ error: "Collection not set" });
@@ -214,7 +209,7 @@ app.get("/docs", async (req, res) => {
   }
 });
 
-// Function to fetch and display the user's documents
+// fetch all docs
 async function fetchUserDocuments() {
   try {
     const response = await fetch('/docs');
@@ -234,10 +229,10 @@ async function fetchUserDocuments() {
   }
 }
 
-// Route for the home page
+// home route
 app.get('/', (req, res) => {
   console.log("Home route reached");
-  console.log("Rendering your response, apping your GET");
+  console.log("Home route");
   res.render('index', { msg: '', layout: false });
 });
 
@@ -250,13 +245,9 @@ app.use(function(req, res, next) {
     res.render('index', { msg: 'login failed, please try again', layout: false });
 });
 
-
-// paste here
-// Route for the login page
+// login extras
 app.get('/login', (req, res) => {
   console.log("Login2 route reached");
-
-
   const username = req.session.username || ''; 
   console.log("Login2's username is...", username);
   const msg = username ? `You've logged in! Welcome, ${username}` : '';
@@ -265,16 +256,16 @@ app.get('/login', (req, res) => {
   res.render('login', { msg, username, layout: false });
 });
 
-// Start the server
+// start server
 app.listen(process.env.PORT || 3000);
 
-// Function to generate and display the user's documents in a table format
+// table work
 function generateTable(userDocuments) {
   const table = document.createElement('table');
   table.border = '1';
 
   const headerRow = table.insertRow();
-  const headers = ['Name', 'Musical', 'Songs']; // Adjust these based on your fields
+  const headers = ['Name', 'Musical', 'Songs']; 
   headers.forEach(header => {
     const th = document.createElement('th');
     th.innerText = header;
@@ -283,15 +274,14 @@ function generateTable(userDocuments) {
 
   userDocuments.forEach(doc => {
     const row = table.insertRow();
-    const cells = [doc.name, doc.musical, doc.songs]; // Adjust these based on your fields
+    const cells = [doc.name, doc.musical, doc.songs];
     cells.forEach(cellData => {
       const cell = row.insertCell();
       cell.innerText = cellData;
     });
   });
 
-  // Assuming you have a div with ID 'user-documents' to append the table
   const container = document.getElementById('user-documents');
-  container.innerHTML = ''; // Clear previous contents
+  container.innerHTML = ''; // clear old stuff; backup for clearTable
   container.appendChild(table);
 }
